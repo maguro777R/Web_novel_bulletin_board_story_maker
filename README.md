@@ -1,0 +1,2 @@
+# Web_novel_bulletin_board_story_maker
+Web小説用の、掲示板回作成用スクリプトを作成します。
