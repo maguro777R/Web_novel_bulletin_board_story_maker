@@ -20,10 +20,15 @@ Web小説の掲示板回用フォーマッタースクリプト
 
     n+2. 名無し
     コメント
+
+特殊機能:
+    「＊」を含む行があると、その後の番号は直前の値から50〜250を
+    ランダムに足した値にジャンプする
 """
 
 import sys
 import re
+import random
 
 
 def format_bulletin_board(text: str, start_number: int = 1) -> str:
@@ -56,13 +61,36 @@ def format_bulletin_board(text: str, start_number: int = 1) -> str:
     
     # コメントを処理
     current_comment = []
+    pending_jump = False  # 「＊」の後にジャンプするかどうか
     
     for line in lines[content_start:]:
         stripped = line.strip()
         
+        # 「＊」マーカーをチェック
+        if '＊' in stripped:
+            # 現在のコメントを確定（もしあれば）
+            if current_comment:
+                result.append(f"{comment_number}. 名無し")
+                result.extend(current_comment)
+                result.append('')
+                comment_number += 1
+                current_comment = []
+            # 「＊」行をそのまま出力
+            result.append('')
+            result.append(line)
+            result.append('')
+            # 次のコメントの番号をジャンプさせるフラグを立てる
+            pending_jump = True
+            continue
+        
         if stripped == '':
             # 空行の場合、現在のコメントを確定
             if current_comment:
+                # ジャンプが必要な場合、番号を50〜250増加
+                if pending_jump:
+                    jump = random.randint(50, 250)
+                    comment_number = (comment_number - 1) + jump
+                    pending_jump = False
                 result.append(f"{comment_number}. 名無し")
                 result.extend(current_comment)
                 result.append('')
@@ -74,6 +102,11 @@ def format_bulletin_board(text: str, start_number: int = 1) -> str:
     
     # 最後のコメントを処理
     if current_comment:
+        # ジャンプが必要な場合、番号を50〜250増加
+        if pending_jump:
+            jump = random.randint(50, 250)
+            comment_number = (comment_number - 1) + jump
+            pending_jump = False
         result.append(f"{comment_number}. 名無し")
         result.extend(current_comment)
     
