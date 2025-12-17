@@ -30,18 +30,42 @@ import sys
 import re
 import random
 
+# =============================================================================
+# 設定パラメータ
+# =============================================================================
+DEFAULT_ANONYMOUS_NAME = "名無し"  # デフォルトの匿名名
+DEFAULT_JUMP_MIN = 50              # 「＊」後のジャンプ最小値
+DEFAULT_JUMP_MAX = 250             # 「＊」後のジャンプ最大値
 
-def format_bulletin_board(text: str, start_number: int = 1) -> str:
+
+def format_bulletin_board(
+    text: str,
+    start_number: int = 1,
+    anonymous_name: str = None,
+    jump_min: int = None,
+    jump_max: int = None
+) -> str:
     """
     掲示板形式にテキストをフォーマットする
     
     Args:
         text: 入力テキスト
         start_number: 開始番号（デフォルト: 1）
+        anonymous_name: 匿名名（デフォルト: DEFAULT_ANONYMOUS_NAME）
+        jump_min: 「＊」後のジャンプ最小値（デフォルト: DEFAULT_JUMP_MIN）
+        jump_max: 「＊」後のジャンプ最大値（デフォルト: DEFAULT_JUMP_MAX）
     
     Returns:
         フォーマットされたテキスト
     """
+    # デフォルト値を適用
+    if anonymous_name is None:
+        anonymous_name = DEFAULT_ANONYMOUS_NAME
+    if jump_min is None:
+        jump_min = DEFAULT_JUMP_MIN
+    if jump_max is None:
+        jump_max = DEFAULT_JUMP_MAX
+    
     lines = text.strip().split('\n')
     result = []
     comment_number = start_number
@@ -70,7 +94,7 @@ def format_bulletin_board(text: str, start_number: int = 1) -> str:
         if '＊' in stripped:
             # 現在のコメントを確定（もしあれば）
             if current_comment:
-                result.append(f"{comment_number}. 名無し")
+                result.append(f"{comment_number}. {anonymous_name}")
                 result.extend(current_comment)
                 result.append('')
                 comment_number += 1
@@ -86,12 +110,12 @@ def format_bulletin_board(text: str, start_number: int = 1) -> str:
         if stripped == '':
             # 空行の場合、現在のコメントを確定
             if current_comment:
-                # ジャンプが必要な場合、番号を50〜250増加
+                # ジャンプが必要な場合、番号を増加
                 if pending_jump:
-                    jump = random.randint(50, 250)
+                    jump = random.randint(jump_min, jump_max)
                     comment_number = (comment_number - 1) + jump
                     pending_jump = False
-                result.append(f"{comment_number}. 名無し")
+                result.append(f"{comment_number}. {anonymous_name}")
                 result.extend(current_comment)
                 result.append('')
                 comment_number += 1
@@ -102,12 +126,12 @@ def format_bulletin_board(text: str, start_number: int = 1) -> str:
     
     # 最後のコメントを処理
     if current_comment:
-        # ジャンプが必要な場合、番号を50〜250増加
+        # ジャンプが必要な場合、番号を増加
         if pending_jump:
-            jump = random.randint(50, 250)
+            jump = random.randint(jump_min, jump_max)
             comment_number = (comment_number - 1) + jump
             pending_jump = False
-        result.append(f"{comment_number}. 名無し")
+        result.append(f"{comment_number}. {anonymous_name}")
         result.extend(current_comment)
     
     return '\n'.join(result)
