@@ -123,3 +123,34 @@ python3 bulletin_board_formatter.py input.txt --name "ななしさん" --jump-mi
 11. 名無し
 次のコメント
 ```
+
+## 🌐 GitHub Pages版（Web版）
+
+ブラウザから直接使用できるWeb版も用意されています。Pythonのインストールは不要です。
+
+### オンラインで使う
+
+以下のURLにアクセスしてください：
+
+https://maguro777r.github.io/Web_novel_bulletin_board_story_maker/
+
+### ローカルで使う
+
+`docs/index.html` をブラウザで直接開いてください。
+
+### 機能
+
+- 📝 テキストを入力して「変換する」ボタンをクリック
+- ⚙️ 開始番号、匿名名、ジャンプ幅を設定パネルでカスタマイズ
+- 📋 結果をワンクリックでクリップボードにコピー
+- 💾 結果をテキストファイルとしてダウンロード
+- ⌨️ `Ctrl+Enter` / `Cmd+Enter` で素早く変換
+
+### GitHub Pagesの有効化
+
+自分のリポジトリでGitHub Pagesを有効にするには：
+
+1. GitHubリポジトリの **Settings** → **Pages** に移動
+2. **Source** で `Deploy from a branch` を選択
+3. **Branch** で `main`（または `master`）ブランチと `/docs` フォルダを選択
+4. **Save** をクリック
