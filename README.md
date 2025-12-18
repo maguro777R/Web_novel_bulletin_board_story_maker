@@ -8,7 +8,7 @@ Web小説用の、掲示板回作成用スクリプトです。
 
 ## 使い方
 
-### 基本的な使い方
+### 基本的な使い方（標準入力）
 
 ```bash
 python3 bulletin_board_formatter.py
@@ -19,12 +19,38 @@ python3 bulletin_board_formatter.py
 ### ファイルから読み込む場合
 
 ```bash
-cat input.txt | python3 bulletin_board_formatter.py
+python3 bulletin_board_formatter.py input.txt
 ```
 
-### 開始番号を指定する場合
+### ファイルに出力する場合
 
-最初の行に数字を入力すると、その番号からカウントを開始します。
+```bash
+python3 bulletin_board_formatter.py input.txt -o output.txt
+```
+
+### コマンドラインオプション
+
+| オプション | 説明 |
+|-----------|------|
+| `input_file` | 入力ファイルのパス（省略で標準入力） |
+| `-o`, `--output` | 出力ファイルのパス（省略で標準出力） |
+| `-n`, `--start-number` | 開始番号（デフォルト: 1） |
+| `--name` | 匿名名（デフォルト: 名無し） |
+| `--jump-min` | 「＊」後のジャンプ最小値（デフォルト: 50） |
+| `--jump-max` | 「＊」後のジャンプ最大値（デフォルト: 250） |
+
+### 使用例
+
+```bash
+# 基本的な使い方
+python3 bulletin_board_formatter.py input.txt -o output.txt
+
+# 開始番号を100に指定
+python3 bulletin_board_formatter.py input.txt -o output.txt -n 100
+
+# 匿名名とジャンプ範囲をカスタマイズ
+python3 bulletin_board_formatter.py input.txt --name "ななしさん" --jump-min 100 --jump-max 300
+```
 
 ## 入力形式
 

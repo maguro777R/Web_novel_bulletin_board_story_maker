@@ -29,6 +29,7 @@ Web小説の掲示板回用フォーマッタースクリプト
 import sys
 import re
 import random
+import argparse
 
 # =============================================================================
 # 設定パラメータ
@@ -139,36 +140,104 @@ def format_bulletin_board(
 
 def main():
     """メイン関数"""
-    print("テキストを入力してください（Ctrl+D または Ctrl+Z で終了）:")
-    print("開始番号を指定する場合は、最初の行に数字を入力してください。")
-    print("-" * 50)
+    parser = argparse.ArgumentParser(
+        description='Web小説の掲示板回用フォーマッタースクリプト',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+使用例:
+  python bulletin_board_formatter.py input.txt
+  python bulletin_board_formatter.py input.txt -o output.txt
+  python bulletin_board_formatter.py input.txt -o output.txt -n 100
+  python bulletin_board_formatter.py input.txt --name "ななしさん" --jump-min 100 --jump-max 300
+  
+引数なしで実行すると、標準入力から読み込みます。
+        '''
+    )
     
-    try:
-        input_text = sys.stdin.read()
-    except KeyboardInterrupt:
-        print("\n中断されました。")
-        return
+    parser.add_argument(
+        'input_file',
+        nargs='?',
+        help='入力ファイルのパス（省略時は標準入力から読み込み）'
+    )
+    parser.add_argument(
+        '-o', '--output',
+        dest='output_file',
+        help='出力ファイルのパス（省略時は標準出力に表示）'
+    )
+    parser.add_argument(
+        '-n', '--start-number',
+        type=int,
+        default=1,
+        help='開始番号（デフォルト: 1）'
+    )
+    parser.add_argument(
+        '--name',
+        dest='anonymous_name',
+        default=DEFAULT_ANONYMOUS_NAME,
+        help=f'匿名名（デフォルト: {DEFAULT_ANONYMOUS_NAME}）'
+    )
+    parser.add_argument(
+        '--jump-min',
+        type=int,
+        default=DEFAULT_JUMP_MIN,
+        help=f'「＊」後のジャンプ最小値（デフォルト: {DEFAULT_JUMP_MIN}）'
+    )
+    parser.add_argument(
+        '--jump-max',
+        type=int,
+        default=DEFAULT_JUMP_MAX,
+        help=f'「＊」後のジャンプ最大値（デフォルト: {DEFAULT_JUMP_MAX}）'
+    )
+    
+    args = parser.parse_args()
+    
+    # 入力テキストの取得
+    if args.input_file:
+        try:
+            with open(args.input_file, 'r', encoding='utf-8') as f:
+                input_text = f.read()
+        except FileNotFoundError:
+            print(f"エラー: ファイル '{args.input_file}' が見つかりません。", file=sys.stderr)
+            sys.exit(1)
+        except IOError as e:
+            print(f"エラー: ファイルの読み込みに失敗しました: {e}", file=sys.stderr)
+            sys.exit(1)
+    else:
+        print("テキストを入力してください（Ctrl+D または Ctrl+Z で終了）:")
+        print("-" * 50)
+        try:
+            input_text = sys.stdin.read()
+        except KeyboardInterrupt:
+            print("\n中断されました。")
+            return
     
     if not input_text.strip():
-        print("入力がありません。")
-        return
+        print("入力がありません。", file=sys.stderr)
+        sys.exit(1)
     
-    # 開始番号をチェック
-    lines = input_text.strip().split('\n')
-    start_number = 1
+    # フォーマット実行
+    result = format_bulletin_board(
+        input_text,
+        start_number=args.start_number,
+        anonymous_name=args.anonymous_name,
+        jump_min=args.jump_min,
+        jump_max=args.jump_max
+    )
     
-    # 最初の行が数字のみの場合、開始番号として扱う
-    first_line = lines[0].strip()
-    if first_line.isdigit():
-        start_number = int(first_line)
-        input_text = '\n'.join(lines[1:])
-    
-    result = format_bulletin_board(input_text, start_number)
-    
-    print("\n" + "=" * 50)
-    print("出力結果:")
-    print("=" * 50)
-    print(result)
+    # 出力
+    if args.output_file:
+        try:
+            with open(args.output_file, 'w', encoding='utf-8') as f:
+                f.write(result)
+            print(f"出力完了: {args.output_file}")
+        except IOError as e:
+            print(f"エラー: ファイルの書き込みに失敗しました: {e}", file=sys.stderr)
+            sys.exit(1)
+    else:
+        print("\n" + "=" * 50)
+        print("出力結果:")
+        print("=" * 50)
+        print(result)
 
 
 if __name__ == "__main__":
