@@ -41,7 +41,6 @@ function formatBulletinBoard(text, startNumber, anonymousName, jumpMin, jumpMax)
         currentComment = [];
       }
       // 「＊」行をそのまま出力
-      result.push('');
       result.push(line);
       result.push('');
       // 次のコメントの番号をジャンプさせるフラグを立てる
